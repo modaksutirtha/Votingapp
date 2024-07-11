@@ -68,9 +68,9 @@ router.post('/vote/:candidateid', jwtauthmiddleware, async (req, res) => {
         const user = await User.findById(userid);
         if (!user) return res.status(404).json({ message: 'user not found' });
 
-        if (user.isvote) res.status(400).json({ message: 'you have already voted' });
+        if (user.isvote) return res.status(400).json({ message: 'you have already voted' });
 
-        if (user.role === 'admin') res.status(403).json({ message: 'you are admin you cant vote' });
+        if (user.role === 'admin') return res.status(403).json({ message: 'you are admin you cant vote' });
 
 
         Candidate.votes.push({user: userid});
@@ -91,18 +91,18 @@ router.post('/vote/:candidateid', jwtauthmiddleware, async (req, res) => {
 
 router.put('/:candidateid', jwtauthmiddleware, async (req, res) => {
     try {
-        if (checkadminrole(req.user.id)) {
+        if (!checkadminrole(req.user.id)) {
             return res.status(403).json({ message: 'the user is not admin' });
         }
         const candidateid = req.params.candidateid;
         const updatedinfo = req.body;
-        const response = await person.findByIdAndUpdate(candidateid, updatedinfo, {
+        const response = await candidate.findByIdAndUpdate(candidateid, updatedinfo, {
             new: true,
             runvalidators: true
         })
 
         if (!response) {
-            return res.status(404)('candidate not found');
+            return res.status(404).json('candidate not found');
         }
         console.log('candidate updated info');
         res.status(200).json(response);
@@ -118,14 +118,14 @@ router.put('/:candidateid', jwtauthmiddleware, async (req, res) => {
 
 router.delete('/:candidateid', jwtauthmiddleware, async (req, res) => {
     try {
-        if (checkadminrole(req.user.id)) {
+        if (!checkadminrole(req.user.id)) {
             return res.status(403).json({ message: 'the user is not admin' });
         }
         const candidateid = req.params.candidateid;
-        const response = await person.findByIdAndDelete(candidateid);
+        const response = await candidate.findByIdAndDelete(candidateid);
 
         if (!response) {
-            return res.status(404)('candidate not found');
+            return res.status(404).json('candidate not found');
         }
         console.log('candidate deleted info');
         res.status(200).json(response);
@@ -134,6 +134,25 @@ router.delete('/:candidateid', jwtauthmiddleware, async (req, res) => {
     catch (err) {
         console.log('the eroor is:', err);
         res.status(500).json({ error: 'delete candidate internel server error' });
+
+    }
+})
+//.....................................................................................
+
+router.get('/:party', jwtauthmiddleware, async (req, res) => {
+    try {
+        const party = req.params.party;
+        const response = await candidate.find({party});
+
+        if (!response) {
+            return res.status(404).json('no candidates from this party were not found');
+        }
+        res.status(200).json(response);
+
+    }
+    catch (err) {
+        console.log('the eroor is:', err);
+        res.status(500).json({ error: 'get candidates by party internel server error' });
 
     }
 })
