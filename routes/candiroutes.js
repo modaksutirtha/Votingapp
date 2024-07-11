@@ -37,6 +37,43 @@ router.get('/vote/count', async (req, res) => {
         res.status(500).json({ error: 'cant get count' });
     }
 })
+router.get('/:party', jwtauthmiddleware, async (req, res) => {
+    try {
+        const party = req.params.party;
+        const response = await candidate.find({party});
+
+        if (!response) {
+            return res.status(404).json('no candidates from this party were not found');
+        }
+        res.status(200).json(response);
+
+    }
+    catch (err) {
+        console.log('the eroor is:', err);
+        res.status(500).json({ error: 'get candidates by party internel server error' });
+
+    }
+})
+
+router.get('/', async(req,res)=>{
+    try{
+        const AllCandidate = await candidate.find().sort({ party:'desc' });
+        const candidaterecord = AllCandidate.map((data) => {
+            return {
+                name:data.name,
+                party: data.party,
+                age: data.age
+            }
+        });
+        return res.status(200).json(candidaterecord);
+
+    }
+    catch(err){
+        console.log('the eroor is:', err);
+        res.status(500).json({ error: 'cant get candidates' });
+
+    }
+})
 //..............................................................................................................
 router.post('/', jwtauthmiddleware, async (req, res) => {
 
@@ -139,23 +176,7 @@ router.delete('/:candidateid', jwtauthmiddleware, async (req, res) => {
 })
 //.....................................................................................
 
-router.get('/:party', jwtauthmiddleware, async (req, res) => {
-    try {
-        const party = req.params.party;
-        const response = await candidate.find({party});
 
-        if (!response) {
-            return res.status(404).json('no candidates from this party were not found');
-        }
-        res.status(200).json(response);
-
-    }
-    catch (err) {
-        console.log('the eroor is:', err);
-        res.status(500).json({ error: 'get candidates by party internel server error' });
-
-    }
-})
 //........................................................................................
 
 module.exports = router;
