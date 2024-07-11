@@ -15,4 +15,4 @@ app.use('/user',userroutes);
 app.use('/candidate',candiroutes);
 
 
-app.listen(port,console.log('port running at 1500'));
+app.listen(port,console.log(`port running at ${port}`));
