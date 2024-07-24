@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/user');
 const candidate = require("../models/candidate");
 
-const { jwtauthmiddleware, generatetoken } = require('../jwt');
+const { jwtauthmiddleware } = require('../jwt');
 
 
 
@@ -33,7 +33,7 @@ router.get('/vote/count', async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'cant get count' });
     }
 })
@@ -43,13 +43,13 @@ router.get('/:party', jwtauthmiddleware, async (req, res) => {
         const response = await candidate.find({party});
 
         if (!response) {
-            return res.status(404).json('no candidates from this party were not found');
+            return res.status(404).json('no candidates from this party were found');
         }
         res.status(200).json(response);
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'get candidates by party internel server error' });
 
     }
@@ -57,19 +57,22 @@ router.get('/:party', jwtauthmiddleware, async (req, res) => {
 
 router.get('/', async(req,res)=>{
     try{
-        const AllCandidate = await candidate.find().sort({ party:'desc' });
+        // const AllCandidate = await candidate.find().sort({ party:'desc' });
+        const AllCandidate = await candidate.find();
         const candidaterecord = AllCandidate.map((data) => {
             return {
+                _id: data._id,
                 name:data.name,
                 party: data.party,
-                age: data.age
+                age: data.age,
+                description: data.description
             }
         });
         return res.status(200).json(candidaterecord);
 
     }
     catch(err){
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'cant get candidates' });
 
     }
@@ -89,7 +92,7 @@ router.post('/', jwtauthmiddleware, async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'internel server error in candi save' });
 
     }
@@ -120,7 +123,7 @@ router.post('/vote/:candidateid', jwtauthmiddleware, async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'user your vote can not be given' });
     }
 })
@@ -146,7 +149,7 @@ router.put('/:candidateid', jwtauthmiddleware, async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'update info internel server error' });
 
     }
@@ -169,7 +172,7 @@ router.delete('/:candidateid', jwtauthmiddleware, async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'delete candidate internel server error' });
 
     }

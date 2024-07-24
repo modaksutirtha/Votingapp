@@ -24,7 +24,7 @@ router.post('/signup', async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'internel server error' });
 
     }
@@ -47,7 +47,7 @@ router.post('/login', async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'internel server error' });
 
     }
@@ -86,7 +86,7 @@ router.put('/profile/password', jwtauthmiddleware, async (req, res) => {
 
     }
     catch (err) {
-        console.log('the eroor is:', err);
+        console.log('the error is:', err);
         res.status(500).json({ error: 'update info internel server error' });
 
     }
