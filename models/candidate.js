@@ -32,6 +32,10 @@ const candischema= new mongoose.Schema({
     votecount:{
         type:Number,
         default:0
+    },
+    description:{
+        type: String,
+        required:true
     }
 
 
