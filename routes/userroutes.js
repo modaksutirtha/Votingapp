@@ -2,19 +2,26 @@ const express = require("express");
 const router = express.Router();
 const user = require('../models/user');
 const { jwtauthmiddleware, generatetoken } = require('../jwt');
-//const user = require("../models/user");
 //..........................................................................................................
 router.post('/signup', async (req, res) => {
 
     try {
         const data = req.body;
+        if(!(data.name && data.age && data.email && data.mobile && data.address && data.adhar && data.password)){
+            throw new Error("Please fill all the fields");
+        }
+        if(data.mobile<1000000000 || data.mobile>9999999999){
+            throw new Error("Please provide a 10 digit mobile number");
+        }
+        if(data.adhar<100000000000 || data.adhar>999999999999){
+            throw new Error("Please provide a 12 digit adhar number");
+        }
         const newuser = new user(data);
         const response = await newuser.save();
         console.log('data saved');
 
         const payload = {
             id: response.id,
-            //username: response.username
         }
         console.log(JSON.stringify(payload));
         const token = generatetoken(payload);
@@ -25,8 +32,7 @@ router.post('/signup', async (req, res) => {
     }
     catch (err) {
         console.log('the error is:', err);
-        res.status(500).json({ error: 'internel server error' });
-
+        res.status(500).json({ error: err.message });
     }
 })
 
@@ -34,13 +40,18 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
 
     try {
-        const { adhar, password } = req.body;
+        const { name, adhar, password } = req.body;
+        if(!name || !adhar || !password){
+            throw new Error("Please fill all the fields");
+        }
+        if(adhar<100000000000 || adhar>999999999999){
+            throw new Error("Please provide a 12 digit adhar number");
+        }
         const userTryingToLogin = await user.findOne({ adhar: adhar });
         if (!userTryingToLogin || !(await userTryingToLogin.comparepassword(password)))
             return res.status(401).json({ error: "invalid" });
         const payload = {
             id: userTryingToLogin.id,
-            //username:user.username
         }
         const token = generatetoken(payload);
         res.json({ token });
@@ -48,8 +59,7 @@ router.post('/login', async (req, res) => {
     }
     catch (err) {
         console.log('the error is:', err);
-        res.status(500).json({ error: 'internel server error' });
-
+        res.status(500).json({ error: err.message });
     }
 })
 //............................................................................................................
@@ -58,7 +68,6 @@ router.post('/login', async (req, res) => {
 router.get('/profile', jwtauthmiddleware, async (req, res) => {
     try {
         const userData = req.user;
-        //console.log("User Data: ", userData);
 
         const userId = userData.id;
         const userProfile = await user.findById(userId);
@@ -88,7 +97,6 @@ router.put('/profile/password', jwtauthmiddleware, async (req, res) => {
     catch (err) {
         console.log('the error is:', err);
         res.status(500).json({ error: 'update info internel server error' });
-
     }
 })
 //.....................................................................................
