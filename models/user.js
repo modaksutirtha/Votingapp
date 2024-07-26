@@ -15,15 +15,18 @@ const userschema= new mongoose.Schema({
     },
     mobile:{
         type:Number,
+        min:1000000000,
+        max:9999999999,
         required: true
     },
     address:{
-
         type:String,
         required:true
     },
     adhar:{
-        type:String,
+        type:Number,
+        min: 100000000000,
+        max: 999999999999,
         required:true,
         unique:true
     },
