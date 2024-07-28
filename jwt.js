@@ -15,6 +15,6 @@ const jwtauthmiddleware=(req,res,next)=>{
 }
 
 const generatetoken=(userdata)=>{
-    return jwt.sign(userdata,process.env.JWT_SECRET);
+    return jwt.sign(userdata,process.env.JWT_SECRET, {expiresIn: "2d"});
 }
 module.exports={jwtauthmiddleware,generatetoken};
