@@ -37,7 +37,7 @@ router.get('/vote/count', async (req, res) => {
         res.status(500).json({ error: 'cant get count' });
     }
 })
-router.get('/:party', jwtauthmiddleware, async (req, res) => {
+router.get('/:party', async (req, res) => {
     try {
         const party = req.params.party;
         const response = await candidate.find({party});
